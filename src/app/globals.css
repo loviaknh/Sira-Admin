@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark *));
+
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
@@ -8,5 +10,11 @@
   body {
     background-color: #f9fafb; /* gray-50 */
     color: #1f2937; /* gray-800 */
+  }
+
+  .dark body,
+  :where(.dark) body {
+    background-color: #111827; /* gray-900 */
+    color: #f3f4f6; /* gray-100 */
   }
 }

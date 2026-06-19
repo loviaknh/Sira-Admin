@@ -1,8 +1,8 @@
 "use client";
 
-import { Droplet, TrendingDown, ArrowUpRight, Search, Plus, Filter, Heart, Activity } from 'lucide-react';
+import { Droplet, TrendingDown, Search, Plus, Filter, Heart, Activity } from 'lucide-react';
 import clsx from 'clsx';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 const stockData = [
   { group: 'O+', stock: 450, min: 200 },
