@@ -2,8 +2,34 @@
 
 import { Ambulance, MapPin, PhoneCall, AlertTriangle, Clock, Map as MapIcon, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { useState, useCallback } from 'react';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%'
+};
+
+const center = {
+  lat: 6.36536, // Cotonou
+  lng: 2.41833
+};
 
 export default function SOSSantePage() {
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "" // Uses empty string if no key provided
+  });
+  
+  const [map, setMap] = useState(null);
+
+  const onLoad = useCallback(function callback(map: any) {
+    setMap(map);
+  }, []);
+
+  const onUnmount = useCallback(function callback(map: any) {
+    setMap(null);
+  }, []);
   return (
     <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
       
@@ -85,50 +111,52 @@ export default function SOSSantePage() {
         </div>
 
         {/* Map Area */}
-        <div className="flex-1 bg-blue-50/30 relative">
-          {/* Note: In a real app we use react-leaflet here. For the mockup, we use a placeholder that looks exactly like the image map area */}
-          <div className="absolute inset-0 bg-[#e5e9ea] overflow-hidden flex items-center justify-center">
-            {/* Faux carte */}
-            <div className="w-full h-full opacity-60 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-multiply"></div>
-            
-            {/* Faux Route / Lac */}
-            <div className="absolute top-1/3 left-0 right-0 h-32 bg-blue-100/50 -rotate-12 transform scale-150"></div>
-            
-            {/* Pins */}
-            <div className="absolute top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-              <div className="bg-red-500 text-white rounded-lg px-3 py-2 shadow-lg flex flex-col gap-1 w-48 animate-pulse-soft z-10">
-                <div className="flex justify-between items-center border-b border-white/20 pb-1 mb-1">
-                  <span className="font-bold text-sm">SOS 2026-001</span>
-                  <AlertTriangle size={14} />
-                </div>
-                <div className="text-xs space-y-1">
-                  <p className="flex justify-between"><span>Patient:</span> <strong>HOUENANOU A.</strong></p>
-                  <p className="flex justify-between"><span>Position:</span> <strong>Cotonou</strong></p>
-                </div>
-                <button className="mt-2 bg-white text-red-500 text-xs font-bold py-1 rounded">Voir détails</button>
-              </div>
-              <div className="w-4 h-4 bg-red-500 rotate-45 -mt-2 shadow-lg"></div>
+        <div className="flex-1 relative">
+          {!isLoaded ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <p className="text-gray-500 font-medium">Chargement de Google Maps...</p>
             </div>
+          ) : (
+            <GoogleMap
+              mapContainerStyle={mapContainerStyle}
+              center={center}
+              zoom={13}
+              onLoad={onLoad}
+              onUnmount={onUnmount}
+              options={{
+                disableDefaultUI: false,
+                zoomControl: true,
+              }}
+            >
+              {/* Marker for SOS Alert */}
+              <Marker position={{ lat: 6.36536, lng: 2.41833 }}>
+                <InfoWindow position={{ lat: 6.36536, lng: 2.41833 }}>
+                  <div className="p-1">
+                    <h3 className="font-bold text-red-600 text-sm mb-1">SOS 2026-001</h3>
+                    <p className="text-xs">Patient: HOUENANOU A.</p>
+                  </div>
+                </InfoWindow>
+              </Marker>
 
-            <div className="absolute top-[40%] right-1/3 transform -translate-x-1/2 flex flex-col items-center">
-              <div className="bg-white border border-gray-200 rounded-full p-2 shadow-md">
-                <Ambulance size={20} className="text-[#0FA958]" />
-              </div>
-            </div>
-            
-            <div className="absolute bottom-1/3 right-1/4 transform -translate-x-1/2 flex flex-col items-center">
-              <div className="bg-white border border-gray-200 rounded-full p-2 shadow-md">
-                <MapIcon size={20} className="text-blue-500" />
-              </div>
-              <span className="bg-white text-[10px] font-bold px-1.5 py-0.5 mt-1 rounded shadow-sm">CHU-MEL</span>
-            </div>
-            
-            {/* Map Controls */}
-            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-              <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-600 hover:text-gray-900 font-bold text-xl">+</button>
-              <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-600 hover:text-gray-900 font-bold text-xl">-</button>
-            </div>
-          </div>
+              {/* Marker for Ambulance */}
+              <Marker 
+                position={{ lat: 6.38000, lng: 2.43000 }} 
+                icon={{
+                  url: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230FA958' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 10H6'/%3E%3Cpath d='M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'/%3E%3Cpath d='M19 18h2a1 1 0 0 0 1-1v-3.28a1 1 0 0 0-.68-.95l-1.92-.64A1.5 1.5 0 0 0 19.92 12H14'/%3E%3Ccircle cx='17' cy='18' r='2'/%3E%3Ccircle cx='7' cy='18' r='2'/%3E%3C/svg%3E",
+                  scaledSize: new window.google.maps.Size(32, 32)
+                }}
+              />
+              
+              {/* Marker for Hospital */}
+              <Marker 
+                position={{ lat: 6.35000, lng: 2.40000 }} 
+                icon={{
+                  url: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233B82F6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Cpath d='M12 8v8'/%3E%3Cpath d='M8 12h8'/%3E%3C/svg%3E",
+                  scaledSize: new window.google.maps.Size(32, 32)
+                }}
+              />
+            </GoogleMap>
+          )}
         </div>
 
       </div>
