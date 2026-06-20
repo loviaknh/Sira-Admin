@@ -1,118 +1,77 @@
 "use client";
 
-import { Shield, Award, AlertTriangle, Building, ArrowUpRight, TrendingUp } from 'lucide-react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
-const radarData = [
-  { subject: 'Hygiène', A: 120, B: 110, fullMark: 150 },
-  { subject: 'Accueil', A: 98, B: 130, fullMark: 150 },
-  { subject: 'Équipement', A: 86, B: 130, fullMark: 150 },
-  { subject: 'Temps Attente', A: 99, B: 100, fullMark: 150 },
-  { subject: 'Compétence', A: 85, B: 90, fullMark: 150 },
-  { subject: 'Sécurité', A: 65, B: 85, fullMark: 150 },
-];
-
-const barData = [
-  { name: 'CHU-MEL', satisfaction: 85, conformite: 92 },
-  { name: 'Hôpital Militaire', satisfaction: 94, conformite: 98 },
-  { name: 'CHD Ouémé', satisfaction: 72, conformite: 80 },
-  { name: 'CHD Borgou', satisfaction: 78, conformite: 85 },
-];
+import { StatsCard } from "@/components/admin/StatsCard";
+import { Activity, Shield, Users, HeartPulse, Hospital, TrendingUp } from "lucide-react";
 
 export default function GouvernancePage() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Gouvernance & Qualité</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Évaluation des structures de santé et conformité</p>
-        </div>
-        <button className="bg-[#0FA958] hover:bg-[#0B8A47] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
-          <Shield size={16} />
-          Lancer un audit Qualité
-        </button>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-800">Gouvernance Sanitaire</h1>
+        <p className="text-slate-500 mt-2">Vision stratégique du Ministère de la Santé.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-[#0F5B46] to-[#0FA958] rounded-2xl p-6 shadow-sm text-white">
-          <Award size={32} className="text-green-200 mb-4" />
-          <p className="text-green-100 text-sm font-medium mb-1">Score National Qualité</p>
-          <p className="text-4xl font-black">84.2 <span className="text-lg font-medium text-green-200">/ 100</span></p>
-        </div>
-        
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 shadow-sm flex flex-col justify-center">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-500">
-              <Building size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Hôpitaux certifiés A+</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-gray-100">12 structures</p>
-            </div>
-          </div>
-          <div className="text-xs font-semibold text-blue-500 flex items-center gap-1 mt-2">
-            <TrendingUp size={14} /> +3 cette année
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 shadow-sm flex flex-col justify-center border-l-4 border-l-orange-500">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-500">
-              <AlertTriangle size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Mises en demeure</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-gray-100">2 cliniques</p>
-            </div>
-          </div>
-          <div className="text-xs font-semibold text-gray-500 mt-2">
-            Non-conformité des équipements
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatsCard title="Taux de Vaccination National" value="78.4%" icon={Shield} trend="4.2%" trendUp={true} color="text-indigo-600" />
+        <StatsCard title="Taux d'Occupation Hôpitaux" value="82%" icon={Hospital} trend="1.5%" trendUp={false} color="text-rose-600" />
+        <StatsCard title="Déserts Médicaux (Alerte)" value="14" icon={TrendingUp} trend="2" trendUp={false} color="text-amber-600" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Radar Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-6">Profil Qualité : CHU-MEL vs HIA</h2>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                <PolarGrid stroke="#e5e7eb" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#6B7280', fontSize: 12, fontWeight: 600 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
-                <Radar name="CHU-MEL" dataKey="A" stroke="#0FA958" fill="#0FA958" fillOpacity={0.4} />
-                <Radar name="Hôpital Militaire" dataKey="B" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.4} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-              </RadarChart>
-            </ResponsiveContainer>
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <HeartPulse className="text-rose-500" /> Pathologies Fréquentes (30 jours)
+          </h3>
+          <div className="space-y-6">
+            <ProgressBar label="Paludisme" percentage={45} color="bg-rose-500" count="12,450 cas" />
+            <ProgressBar label="Infections Respiratoires" percentage={25} color="bg-amber-500" count="8,230 cas" />
+            <ProgressBar label="Maladies Diarrhéiques" percentage={15} color="bg-blue-500" count="4,100 cas" />
+            <ProgressBar label="Hypertension Artérielle" percentage={10} color="bg-indigo-500" count="2,800 cas" />
           </div>
         </div>
 
-        {/* Bar Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-6">Performances par structure</h2>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={barData}
-                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
-                <XAxis type="number" domain={[0, 100]} hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#4B5563', fontSize: 12, fontWeight: 500}} width={120} />
-                <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-                <Bar dataKey="satisfaction" name="Satisfaction (%)" fill="#0FA958" radius={[0, 4, 4, 0]} barSize={12} />
-                <Bar dataKey="conformite" name="Conformité (%)" fill="#3B82F6" radius={[0, 4, 4, 0]} barSize={12} />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <Activity className="text-emerald-500" /> Classement Qualité Établissements
+          </h3>
+          <div className="space-y-4">
+            <RankingItem rank={1} name="Hôpital de Zone de Suru-Léré" score={98} />
+            <RankingItem rank={2} name="CNHU-HKM Cotonou" score={94} />
+            <RankingItem rank={3} name="Clinique Mahouna" score={91} />
+            <RankingItem rank={4} name="Centre de Santé de Ouidah" score={88} />
+            <RankingItem rank={5} name="Hôpital Mère-Enfant Lagune" score={85} />
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
 
+function ProgressBar({ label, percentage, color, count }: { label: string, percentage: number, color: string, count: string }) {
+  return (
+    <div>
+      <div className="flex justify-between text-sm mb-2">
+        <span className="font-semibold text-slate-700">{label}</span>
+        <span className="text-slate-500">{count}</span>
+      </div>
+      <div className="w-full bg-slate-100 rounded-full h-2.5">
+        <div className={`${color} h-2.5 rounded-full`} style={{ width: `${percentage}%` }}></div>
+      </div>
+    </div>
+  );
+}
+
+function RankingItem({ rank, name, score }: { rank: number, name: string, score: number }) {
+  return (
+    <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${rank === 1 ? 'bg-amber-100 text-amber-700' : rank === 2 ? 'bg-slate-200 text-slate-700' : rank === 3 ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'}`}>
+        #{rank}
+      </div>
+      <div className="flex-1">
+        <h4 className="font-semibold text-slate-800">{name}</h4>
+      </div>
+      <div className="text-right">
+        <span className="font-bold text-emerald-600">{score}/100</span>
       </div>
     </div>
   );

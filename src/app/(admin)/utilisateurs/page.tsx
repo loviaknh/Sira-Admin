@@ -1,172 +1,132 @@
 "use client";
 
-import { Search, Filter, Plus, MoreHorizontal, CheckCircle2, XCircle } from 'lucide-react';
-import clsx from 'clsx';
+import { useState } from "react";
+import { DataTable, Column } from "@/components/admin/DataTable";
+import { StatusBadge } from "@/components/admin/StatusBadge";
+import { Check, X, Search, Filter } from "lucide-react";
 
-const mockUsers = [
-  { id: '1', nom: 'HOUENANOU A. Kassi', nip: '1234 5678 9123', tel: '+229 97 00 00 01', region: 'Littoral', role: 'Patient', assurance: 'Oui', statut: 'Actif' },
-  { id: '2', nom: 'ZOUNON M. Clarisse', nip: '1234 5678 9124', tel: '+229 95 00 00 02', region: 'Borgou', role: 'Patient', assurance: 'Non', statut: 'Actif' },
-  { id: '3', nom: 'AGBAYA P. Aristide', nip: '1234 5678 9125', tel: '+229 96 00 00 03', region: 'Littoral', role: 'Médecin', assurance: 'Oui', statut: 'Inactif' },
-  { id: '4', nom: 'DOSSOU Y. Samuel', nip: '1234 5678 9126', tel: '+229 90 00 00 04', region: 'Atlantique', role: 'Patient', assurance: 'Non', statut: 'Actif' },
-  { id: '5', nom: 'KPADONOU S. Esther', nip: '1234 5678 9127', tel: '+229 67 00 00 05', region: 'Zou', role: 'Pharmacien', assurance: 'Oui', statut: 'Actif' },
+type UserKyc = {
+  id: string;
+  nom: string;
+  prenom: string;
+  npi: string;
+  telephone: string;
+  commune: string;
+  dateInscription: string;
+  statut: string;
+  photoUrl: string;
+  idCardUrl: string;
+};
+
+const mockData: UserKyc[] = [
+  { id: "1", nom: "Dossou", prenom: "Kossi", npi: "1002345678", telephone: "+229 97 00 00 01", commune: "Cotonou", dateInscription: "2026-06-18", statut: "En attente", photoUrl: "https://i.pravatar.cc/150?img=11", idCardUrl: "https://i.pravatar.cc/300?img=11" },
+  { id: "2", nom: "Sylla", prenom: "Aminata", npi: "1009876543", telephone: "+229 96 11 22 33", commune: "Parakou", dateInscription: "2026-06-19", statut: "Vérifié", photoUrl: "https://i.pravatar.cc/150?img=5", idCardUrl: "https://i.pravatar.cc/300?img=5" },
+  { id: "3", nom: "Ahouefa", prenom: "Sena", npi: "1005554443", telephone: "+229 95 44 55 66", commune: "Porto-Novo", dateInscription: "2026-06-20", statut: "En attente", photoUrl: "https://i.pravatar.cc/150?img=9", idCardUrl: "https://i.pravatar.cc/300?img=9" },
+  { id: "4", nom: "Chakoun", prenom: "Raoul", npi: "1001112223", telephone: "+229 90 99 88 77", commune: "Abomey-Calavi", dateInscription: "2026-06-15", statut: "Suspendu", photoUrl: "https://i.pravatar.cc/150?img=33", idCardUrl: "https://i.pravatar.cc/300?img=33" },
 ];
 
 export default function UtilisateursPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  const [selectedUser, setSelectedUser] = useState<UserKyc | null>(null);
+
+  const columns: Column<UserKyc>[] = [
+    { header: "Citoyen", accessor: (row) => (
+      <div className="flex items-center gap-3">
+        <img src={row.photoUrl} alt="Avatar" className="w-10 h-10 rounded-full object-cover" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Utilisateurs</h1>
-          <p className="text-sm text-gray-500">Rechercher par NIP, nom, téléphone...</p>
+          <p className="font-semibold text-slate-800">{row.nom} {row.prenom}</p>
+          <p className="text-xs text-slate-500">{row.telephone}</p>
         </div>
-        <button className="bg-[#0FA958] hover:bg-[#0B8A47] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
-          <Plus size={18} />
-          Ajouter un utilisateur
-        </button>
+      </div>
+    )},
+    { header: "NPI (ANIP)", accessor: (row) => <span className="font-mono bg-slate-100 px-2 py-1 rounded text-slate-600">{row.npi}</span> },
+    { header: "Commune", accessor: "commune" },
+    { header: "Date d'inscription", accessor: "dateInscription" },
+    { header: "Statut", accessor: (row) => <StatusBadge status={row.statut} /> },
+    { header: "Actions", accessor: (row) => (
+      <button 
+        onClick={(e) => { e.stopPropagation(); setSelectedUser(row); }}
+        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors"
+      >
+        Détails KYC
+      </button>
+    )},
+  ];
+
+  return (
+    <div className="flex h-[calc(100vh-80px)] gap-6 overflow-hidden">
+      <div className={`flex-1 flex flex-col space-y-6 overflow-y-auto pr-2 ${selectedUser ? 'hidden lg:flex' : 'flex'}`}>
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">Citoyens & KYC</h1>
+          <p className="text-slate-500 mt-2">Validez les identités numériques nationales.</p>
+        </div>
+
+        <div className="flex gap-4 mb-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+            <input type="text" placeholder="Rechercher par NPI, nom, téléphone..." className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl flex items-center gap-2 text-slate-600 hover:bg-slate-50">
+            <Filter size={20} />
+            <span>Filtres</span>
+          </button>
+        </div>
+
+        <DataTable data={mockData} columns={columns} onRowClick={(row) => setSelectedUser(row)} />
       </div>
 
-      {/* Filters Row */}
-      <div className="bg-white p-4 rounded-xl border border-gray-100 flex flex-wrap gap-4 items-end shadow-sm">
-        <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Recherche</label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-            <input 
-              type="text" 
-              placeholder="Ex: 1234 5678..."
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#0FA958]/20 outline-none"
-            />
+      {selectedUser && (
+        <div className="w-full lg:w-[400px] xl:w-[500px] bg-white rounded-2xl border border-slate-100 shadow-xl flex flex-col overflow-hidden animate-in slide-in-from-right-8 duration-300">
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <h2 className="text-xl font-bold text-slate-800">Dossier KYC</h2>
+            <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
+              <X size={24} />
+            </button>
           </div>
-        </div>
-        <div className="w-40">
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Rôle</label>
-          <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none">
-            <option>Tous</option>
-            <option>Patient</option>
-            <option>Médecin</option>
-          </select>
-        </div>
-        <div className="w-40">
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Région</label>
-          <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none">
-            <option>Toutes</option>
-            <option>Littoral</option>
-            <option>Borgou</option>
-          </select>
-        </div>
-        <div className="w-40">
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Statut</label>
-          <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none">
-            <option>Tous</option>
-            <option>Actif</option>
-            <option>Inactif</option>
-          </select>
-        </div>
-        <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg font-medium text-sm hover:bg-gray-200 flex items-center gap-2">
-          <Filter size={16} />
-          Filtrer
-        </button>
-      </div>
+          
+          <div className="p-6 flex-1 overflow-y-auto space-y-8">
+            <div className="flex items-center gap-4">
+              <img src={selectedUser.photoUrl} alt="Selfie" className="w-24 h-24 rounded-2xl object-cover border-4 border-slate-100 shadow-sm" />
+              <div>
+                <h3 className="text-2xl font-bold text-slate-800">{selectedUser.nom} {selectedUser.prenom}</h3>
+                <StatusBadge status={selectedUser.statut} />
+              </div>
+            </div>
 
-      {/* Stats Cards Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total utilisateurs', val: '10 423', color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Patients', val: '9 256', color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Professionnels', val: '538', color: 'text-purple-600', bg: 'bg-purple-50' },
-          { label: 'Administrateurs', val: '45', color: 'text-orange-600', bg: 'bg-orange-50' },
-        ].map((stat, i) => (
-          <div key={i} className={clsx("p-4 rounded-xl border border-gray-100", stat.bg)}>
-            <p className="text-xs font-medium text-gray-600">{stat.label}</p>
-            <p className={clsx("text-xl font-bold mt-1", stat.color)}>{stat.val}</p>
-          </div>
-        ))}
-      </div>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-slate-700 uppercase tracking-wider text-sm">Vérification ANIP</h4>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">NPI Soumis</span>
+                  <span className="font-mono font-medium text-slate-800">{selectedUser.npi}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Score de similarité visage</span>
+                  <span className="font-medium text-emerald-600">98.4%</span>
+                </div>
+              </div>
+            </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
-                <th className="p-4 font-semibold">Nom complet</th>
-                <th className="p-4 font-semibold">NIP</th>
-                <th className="p-4 font-semibold">Téléphone</th>
-                <th className="p-4 font-semibold">Région</th>
-                <th className="p-4 font-semibold">Type</th>
-                <th className="p-4 font-semibold">Assurance</th>
-                <th className="p-4 font-semibold">Statut</th>
-                <th className="p-4 font-semibold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {mockUsers.map((user, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                  <td className="p-4 font-medium text-gray-800 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-                      <img src={`https://i.pravatar.cc/150?u=${user.id}`} alt="avatar" />
-                    </div>
-                    {user.nom}
-                  </td>
-                  <td className="p-4 text-gray-600 font-mono text-xs">{user.nip}</td>
-                  <td className="p-4 text-gray-600">{user.tel}</td>
-                  <td className="p-4 text-gray-600">{user.region}</td>
-                  <td className="p-4 text-gray-600">
-                    <span className={clsx(
-                      "px-2 py-1 rounded-md text-[10px] font-bold",
-                      user.role === 'Patient' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
-                    )}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="p-4 text-gray-600">
-                    {user.assurance === 'Oui' ? (
-                      <span className="text-green-600 flex items-center gap-1 text-xs font-semibold">
-                        <CheckCircle2 size={14} /> Actif
-                      </span>
-                    ) : (
-                      <span className="text-gray-400 flex items-center gap-1 text-xs">
-                        <XCircle size={14} /> Non
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <span className={clsx(
-                      "px-2 py-1 rounded-full text-[10px] font-bold flex items-center w-fit gap-1",
-                      user.statut === 'Actif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                    )}>
-                      <div className={clsx("w-1.5 h-1.5 rounded-full", user.statut === 'Actif' ? "bg-green-500" : "bg-gray-400")} />
-                      {user.statut}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right">
-                    <button className="text-gray-400 hover:text-gray-800 p-1">
-                      <MoreHorizontal size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Pagination (Mock) */}
-        <div className="p-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-          <span>Affichage 1 à 5 sur 10 423 utilisateurs</span>
-          <div className="flex gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50">«</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded bg-[#0FA958] text-white">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50">2</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50">3</button>
-            <span className="w-8 h-8 flex items-center justify-center">...</span>
-            <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50">104</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50">»</button>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-slate-700 uppercase tracking-wider text-sm">Pièce d'Identité</h4>
+              <div className="w-full h-48 bg-slate-200 rounded-xl overflow-hidden border border-slate-200 relative group">
+                <img src={selectedUser.idCardUrl} alt="ID Card" className="w-full h-full object-cover opacity-80" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-white font-medium">Agrandir le document</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 border-t border-slate-100 bg-slate-50 flex gap-4">
+            <button className="flex-1 py-3 bg-rose-100 text-rose-700 font-semibold rounded-xl hover:bg-rose-200 transition-colors flex items-center justify-center gap-2">
+              <X size={20} /> Rejeter
+            </button>
+            <button className="flex-1 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
+              <Check size={20} /> Valider l'identité
+            </button>
           </div>
         </div>
-      </div>
-      
+      )}
     </div>
   );
 }
